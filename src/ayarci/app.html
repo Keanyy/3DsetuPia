@@ -1,0 +1,445 @@
+<!doctype html>
+<html lang="tr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>3DsetuPia</title>
+<style>
+:root{--a:#00897b;--a2:#00695c;--fg:#1f2328;--bg:#f6f7f8;--card:#ffffff;--mut:#6b7280;--line:rgba(127,127,127,.28);
+--soft:rgba(127,127,127,.10);--ok:#2e9d57;--warn:#c98a00;--bad:#d0453a;--accfg:#fff;--drop:rgba(0,137,123,.08)}
+@media (prefers-color-scheme:dark){:root{--a:#26a69a;--a2:#4db6ac;--fg:#e6e8eb;--bg:#16181b;--card:#1f2226;--mut:#9aa3ad;
+--line:rgba(160,160,160,.25);--soft:rgba(160,160,160,.10);--drop:rgba(38,166,154,.12)}}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--fg);font:13px/1.45 "Segoe UI",system-ui,sans-serif}
+body{display:flex;flex-direction:column}
+header{display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid var(--line);background:var(--card)}
+header h1{font-size:16px;margin:0}
+header .logo{color:var(--a);font-size:20px}
+header .grow{flex:1}
+.tabs{display:flex;gap:4px}
+.tabs button{background:transparent;color:var(--fg);border:0;border-bottom:2px solid transparent;border-radius:0;padding:6px 10px;font-weight:600}
+.tabs button.on{border-bottom-color:var(--a);color:var(--a)}
+main{flex:1;overflow:hidden;display:flex}
+section[hidden]{display:none!important}
+#assist{flex:1;display:grid;grid-template-columns:minmax(330px,400px) 1fr;min-height:0}
+#left{overflow:auto;padding:14px;border-right:1px solid var(--line)}
+#right{overflow:auto;padding:14px;display:flex;flex-direction:column;min-height:0}
+#settings{flex:1;overflow:auto;padding:14px 16px;max-width:760px}
+@media (max-width:820px){#assist{grid-template-columns:1fr;overflow:auto}#left{border-right:0}#left,#right{overflow:visible}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:12px}
+.card h3{margin:0 0 8px;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--mut)}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.muted{color:var(--mut);font-size:12px}
+label.fld{display:block;margin:10px 0 4px;font-weight:600;font-size:12px}
+select,input,textarea{width:100%;font:inherit;color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:6px 8px}
+input:disabled,select:disabled,textarea:disabled{opacity:.55;cursor:not-allowed}
+textarea{min-height:44px;resize:vertical}
+button{font:inherit;cursor:pointer;border-radius:6px;padding:7px 12px;border:1px solid var(--a);background:var(--a);color:var(--accfg)}
+button:hover{filter:brightness(1.05)}
+button.ghost{background:transparent;color:var(--fg);border-color:var(--line)}
+button.small{padding:3px 8px;font-size:12px}
+button:disabled{opacity:.45;cursor:default}
+.drop{border:2px dashed var(--line);border-radius:10px;padding:18px 12px;text-align:center;cursor:pointer;background:var(--drop)}
+.drop.over{border-color:var(--a)}
+.drop b{display:block;font-size:14px;margin-bottom:4px}
+.file{display:none}
+.file.on{display:block}
+.fname{font-weight:700;font-size:14px;word-break:break-all}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:3px 10px;font-size:12px;margin-top:8px}
+.kv span:nth-child(odd){color:var(--mut)}
+.chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
+.chip{font-size:11px;padding:2px 7px;border-radius:5px;background:var(--soft);display:inline-flex;align-items:center;gap:5px}
+.sw{width:10px;height:10px;border-radius:3px;border:1px solid var(--line);display:inline-block}
+.intents{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.intent{border:1px solid var(--line);border-radius:8px;padding:7px 8px;background:transparent;color:var(--fg);text-align:left}
+.intent b{display:block;font-size:13px}
+.intent span{font-size:11px;color:var(--mut)}
+.intent.on{border-color:var(--a);box-shadow:inset 0 0 0 1px var(--a)}
+.badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;padding:2px 8px;border-radius:20px;border:1px solid var(--line);white-space:nowrap;max-width:260px;overflow:hidden;text-overflow:ellipsis}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--mut);flex:none}
+.dot.ok{background:var(--ok)}.dot.warn{background:var(--warn)}.dot.bad{background:var(--bad)}
+.status{padding:8px 10px;border-radius:6px;background:var(--soft);margin:8px 0;white-space:pre-wrap}
+.status.ok{border-left:3px solid var(--ok)}.status.warn{border-left:3px solid var(--warn)}.status.bad{border-left:3px solid var(--bad)}.status.info{border-left:3px solid var(--a)}
+.page{border:1px solid var(--line);border-radius:8px;margin-bottom:8px;overflow:hidden;background:var(--card)}
+.page>summary{list-style:none;display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--soft);cursor:pointer;font-weight:600}
+.page>summary::-webkit-details-marker{display:none}
+.page>summary .cnt{margin-left:auto;font-weight:400;color:var(--mut);font-size:12px}
+.chg{display:grid;grid-template-columns:20px 1fr;gap:4px 6px;padding:7px 10px;border-top:1px solid var(--line);cursor:pointer}
+.chg input{width:auto;margin-top:2px}
+.chg .name{font-weight:600}
+.chg .vals{font-family:ui-monospace,Consolas,monospace;font-size:12px}
+.chg .vals .old{color:var(--mut);text-decoration:line-through}
+.chg .vals .new{color:var(--a);font-weight:700}
+.chg .why{grid-column:2;color:var(--mut);font-size:12px}
+.chg .src{font-size:10px;border:1px solid var(--line);border-radius:4px;padding:0 4px;margin-left:4px;color:var(--mut)}
+.empty{margin:auto;text-align:center;color:var(--mut);max-width:420px;padding:30px}
+.empty .big{font-size:42px;color:var(--a);opacity:.7}
+footer{border-top:1px solid var(--line);padding:9px 16px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;background:var(--card)}
+footer .grow{flex:1}
+.checklist{margin:0;padding:0;list-style:none}
+.checklist li{display:flex;gap:8px;align-items:center;padding:3px 0}
+.inline{display:flex;gap:6px}
+.inline input{flex:1}
+.spin{display:inline-block;width:12px;height:12px;border:2px solid var(--line);border-top-color:var(--a);border-radius:50%;animation:s 1s linear infinite;vertical-align:-2px;margin-right:6px}
+@keyframes s{to{transform:rotate(360deg)}}
+a{color:var(--a);cursor:pointer;text-decoration:underline}
+code.sel{user-select:all;background:var(--soft);padding:1px 5px;border-radius:4px;word-break:break-all}
+</style></head>
+<body>
+<header><span class="logo">◆</span><h1>3DsetuPia</h1>
+<div class="tabs"><button id="tabA" class="on" data-i="tab_assist"></button><button id="tabS" data-i="tab_settings"></button></div>
+<span class="grow"></span>
+<span class="badge" id="modeBadge"><span class="dot" id="modeDot"></span><span id="modeText">…</span></span>
+<select id="lang" style="width:auto;padding:2px 4px"><option value="tr">TR</option><option value="en">EN</option></select>
+</header>
+
+<main>
+<section id="assist">
+ <div id="left">
+  <div class="card">
+    <h3 data-i="file_title"></h3>
+    <div class="drop" id="drop"><b data-i="drop_title"></b><span class="muted" data-i="drop_hint"></span></div>
+    <div class="file" id="fileBox">
+      <div class="row"><span class="fname" id="fname" style="flex:1"></span><button class="ghost small" id="change" data-i="change_file"></button></div>
+      <div class="kv" id="fileKv"></div>
+      <div class="chips" id="filChips"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3 data-i="target_title"></h3>
+    <label class="fld" for="target" data-i="target_printer"></label>
+    <select id="target" disabled></select>
+    <div class="muted" id="targetHint" style="margin-top:4px"></div>
+    <label class="fld" for="slot" id="slotLabel" data-i="tune_filament"></label>
+    <select id="slot" disabled></select>
+    <div id="filRow" hidden>
+      <label class="fld" for="filament" data-i="target_filament"></label>
+      <select id="filament"></select>
+    </div>
+    <label class="fld" data-i="goal"></label>
+    <div class="intents" id="intents"></div>
+    <label class="fld" for="note" data-i="note"></label>
+    <textarea id="note" maxlength="500"></textarea>
+    <div class="row" style="margin-top:12px"><button id="go" style="flex:1" disabled data-i="prepare"></button></div>
+  </div>
+ </div>
+
+ <div id="right">
+  <div id="progress" class="status" hidden></div>
+  <div id="empty" class="empty"><div class="big">◆</div><div data-i="empty_text"></div>
+    <div class="muted" style="margin-top:14px"><a id="starLink" data-i="support_short"></a></div></div>
+  <div id="result" hidden>
+    <div class="card"><h3 data-i="what_i_saw"></h3><div id="summary"></div><div class="chips" id="chips"></div></div>
+    <div id="notes"></div>
+    <div id="warnings"></div>
+    <div class="row" style="margin:6px 0">
+      <span class="muted" id="countText" style="flex:1"></span>
+      <button class="ghost small" id="all" data-i="select_all"></button>
+      <button class="ghost small" id="none" data-i="select_none"></button>
+    </div>
+    <div id="pages"></div>
+  </div>
+ </div>
+</section>
+
+<section id="settings" hidden>
+  <div class="card">
+    <h3 data-i="readiness"></h3>
+    <ul class="checklist" id="checklist"></ul>
+  </div>
+  <div class="card">
+    <label class="fld" for="provider" data-i="provider" style="margin-top:0"></label>
+    <select id="provider"></select>
+    <div class="muted" id="provHelp" style="margin-top:4px"></div>
+    <div class="muted" id="keyPage" style="margin-top:4px"></div>
+    <label class="fld" for="url" id="urlLabel" data-i="address"></label>
+    <input id="url" spellcheck="false" autocomplete="off">
+    <label class="fld" for="key" id="keyLabel" data-i="api_key"></label>
+    <div class="inline"><input id="key" type="password" spellcheck="false" autocomplete="off">
+      <button class="ghost small" id="eye" type="button">👁</button></div>
+    <div class="row" style="margin-top:3px"><span class="muted" id="keyState" style="flex:1"></span>
+      <button class="ghost small" id="clearKey" data-i="clear_key"></button></div>
+    <label class="fld" for="model" data-i="model"></label>
+    <input id="model" list="models" spellcheck="false" autocomplete="off">
+    <datalist id="models"></datalist>
+    <div class="muted" id="modelHint"></div>
+    <div class="row" style="margin-top:10px">
+      <button id="save" data-i="save"></button>
+      <button id="test" class="ghost" data-i="test"></button>
+    </div>
+    <div id="setStatus" class="status" hidden></div>
+  </div>
+  <div class="card"><h3 data-i="privacy"></h3><div class="muted" data-i="privacy_text"></div></div>
+  <div class="card"><h3 data-i="slicers"></h3><div class="kv" id="slicers"></div></div>
+  <div class="card"><h3 data-i="support"></h3><div class="muted" data-i="support_text"></div>
+    <div class="row" style="margin-top:8px"><button class="ghost small" id="sStar" data-i="support_star"></button>
+    <button class="ghost small" id="sIssue" data-i="support_issue"></button>
+    <button class="ghost small" id="sSponsor" data-i="support_sponsor"></button></div></div>
+  <div class="card"><h3 data-i="about"></h3><div class="kv" id="about"></div></div>
+</section>
+</main>
+
+<footer id="applyBar" hidden>
+  <span class="grow muted" id="selText"></span>
+  <span id="afterSave" hidden><button class="ghost" id="openSlicer"></button> <button class="ghost" id="showFolder" data-i="show_folder"></button></span>
+  <button id="saveFile" data-i="save_3mf"></button>
+</footer>
+
+<script>
+(function(){
+var T={tr:{tab_assist:"Asistan",tab_settings:"AI Ayarı",file_title:"Dosya",drop_title:"3MF / STL / OBJ dosyasını buraya bırakın",
+drop_hint:"ya da tıklayıp seçin. Bambu Studio, QIDI Studio, OrcaSlicer projeleri ve düz modeller.",change_file:"Başka dosya",
+target_title:"Hedef ve öncelik",target_printer:"Hangi yazıcıda basılacak?",tune_filament:"Ayarlanacak filament",target_filament:"Bu yazıcıdaki filament profili",
+goal:"Bu baskıda öncelik ne?",note:"Parça ne için? (isteğe bağlı)",note_ph:"ör. dişli parça, dış mekânda kalacak, hediye figür, vida tutacak…",
+prepare:"Ayarları hazırla",what_i_saw:"Modelde gördüklerim",select_all:"Tümünü seç",select_none:"Hiçbiri",save_3mf:"Yeni 3MF olarak kaydet",
+show_folder:"Klasörü göster",open_in:"{s} ile aç",empty_text:"Bir dosya açın, hedef yazıcıyı ve önceliği seçip 'Ayarları hazırla'ya basın. Öneriler burada, sekme sekme listelenir; onayladıklarınız yeni bir 3MF dosyasına yazılır. Asıl dosyanız hiç değişmez.",
+readiness:"Hazırlık durumu",provider:"Yapay zekâ sağlayıcısı",address:"Bağlantı adresi",api_key:"API anahtarı",clear_key:"Anahtarı sil",model:"Model",
+save:"Kaydet",test:"Bağlantıyı test et",privacy:"Gizlilik",about:"Hakkında",slicers:"Bulunan slicer'lar",
+privacy_text:"3D modeliniz hiçbir yere gönderilmez. AI'a yalnızca bilgisayarınızda hesaplanan ölçümler (boyut, sarkma alanı, duvar kalınlığı gibi) ve mevcut ayar değerleri gider. API anahtarınız yalnızca bu bilgisayarda, 3DsetuPia'nın veri klasöründe saklanır.",
+i_balanced:"Dengeli",d_balanced:"Kalite, sağlamlık ve süre dengesi",i_looks:"Görünüş",d_looks:"En temiz yüzey, süre ikinci planda",
+i_strength:"Dayanıklılık",d_strength:"Fonksiyonel, güçlü parça",i_speed:"Hız",d_speed:"En kısa sürede, kabul edilebilir kalite",
+same_printer:"Dosyadaki yazıcı: {n} (değiştirme)",pick_printer:"— yazıcı seçin —",all_printers:"Tüm yazıcıları göster…",loading:"Profiller okunuyor…",
+multi_nozzle:"çok nozul",kind_model:"Yalnızca model (ayar yok)",app:"Slicer",printer:"Yazıcı",process:"İşlem profili",bed:"Tabla",objects:"Nesneler",plates:"Plaka",
+slot_auto:"{n}. filament — {name}",used:"kullanılıyor",main:"en çok kullanılan",sliced_note:"dilimlenmiş dosya",
+mode_rules:"Yerel kurallar",mode_ai:"AI: {p}",mode_incomplete:"AI ayarı eksik",
+ck_provider:"Sağlayıcı seçildi",ck_key:"API anahtarı girildi",ck_key_na:"Anahtar gerekmiyor",ck_url:"Adres girildi",ck_test:"Bağlantı test edildi",
+ck_model:"Model seçildi",ck_ready:"Hazır: 'Ayarları hazırla' AI ile çalışacak.",ck_rules:"Yerel kurallar seçili: AI olmadan çalışır, kurulum gerekmez.",
+ck_missing:"Eksik adımlar var. Tamamlanana kadar yerel kurallar kullanılır.",
+url_fixed:"Bu sağlayıcının adresi sabit, değiştirmenize gerek yok.",url_edit:"Programın çalıştığı adres (genelde varsayılan doğrudur).",
+key_na:"Bu sağlayıcı anahtar istemez",key_saved:"Kayıtlı anahtar: {h} (değiştirmek için yenisini yazın)",key_none:"Henüz anahtar kaydedilmedi.",
+key_ph:"Anahtarı buraya yapıştırın",key_replace:"Değiştirmek için yeni anahtarı yapıştırın",key_page:"Anahtar alma sayfası:",model_default:"Önerilen: {m}",model_hint:"'Bağlantıyı test et' kullanılabilir modelleri listeler.",
+saved:"Kaydedildi.",testing:"Test ediliyor…",working:"Çalışıyor…",changes:"{n} öneri",selected:"{n} öneri seçili",
+from_ai:"AI",from_rules:"kural",nothing_needed:"Bu model için mevcut ayarlar zaten uygun görünüyor; değişiklik gerekmiyor. Yine de dosyayı kaydedebilirsiniz.",
+c_height:"Yükseklik {v} mm",c_contact:"Tabana temas {v} mm²",c_overhang:"Sarkma {v} mm²",c_thin:"En ince bölüm ~{v} mm",c_shape_org:"Kavisli / organik",c_shape_mech:"Köşeli / mekanik",
+c_tall:"Uzun ve ince",c_tip:"Devrilme riski",c_flat:"Geniş düz üst yüzey",c_support:"Destek gerekli",c_self:"Desteksiz basılabilir",c_time:"{s} sn",
+src_ai:"AI önerisi",src_rules:"Yerel kurallar",error:"Hata",version:"Sürüm",data:"Veri klasörü",none_found:"Bilgisayarda Bambu Studio, QIDI Studio ya da OrcaSlicer bulunamadı. Aynı yazıcıda ayar yine yapılır; başka yazıcıya dönüştürmek için slicer'ın kurulu olması gerekir.",
+save_hint:"İpucu: Dosyayı slicer'da açın, 'Dilimle'ye basın ve önizlemeyi kontrol edin.",
+support:"Projeyi destekle",support_text:"3DsetuPia ücretsiz ve açık kaynak. Beğendiyseniz GitHub'da bir yıldız vermek, hata bildirmek ya da arkadaşlarınıza önermek en büyük destek. İsterseniz sponsor da olabilirsiniz; tamamen isteğe bağlı.",support_star:"⭐ GitHub'da yıldız ver",support_issue:"🐞 Hata / öneri bildir",support_sponsor:"❤ Sponsor ol",support_short:"Beğendiniz mi? GitHub'da ⭐ vererek destek olun"},
+en:{tab_assist:"Assistant",tab_settings:"AI setup",file_title:"File",drop_title:"Drop a 3MF / STL / OBJ file here",
+drop_hint:"or click to choose. Bambu Studio, QIDI Studio, OrcaSlicer projects and plain models.",change_file:"Other file",
+target_title:"Target and goal",target_printer:"Which printer will print it?",tune_filament:"Filament to tune",target_filament:"Filament profile on this printer",
+goal:"What matters most for this print?",note:"What is the part for? (optional)",note_ph:"e.g. gear, stays outdoors, gift figure, holds screws…",
+prepare:"Prepare settings",what_i_saw:"What I found in the model",select_all:"Select all",select_none:"None",save_3mf:"Save as new 3MF",
+show_folder:"Show folder",open_in:"Open in {s}",empty_text:"Open a file, choose the target printer and the goal, then press 'Prepare settings'. Suggestions appear here, page by page; the ones you approve are written to a new 3MF file. Your original file is never changed.",
+readiness:"Setup status",provider:"AI provider",address:"Server address",api_key:"API key",clear_key:"Delete key",model:"Model",
+save:"Save",test:"Test connection",privacy:"Privacy",about:"About",slicers:"Slicers found",
+privacy_text:"Your 3D model is never sent anywhere. The AI only receives measurements computed on your PC (size, overhang area, wall thickness…) and your current setting values. Your API key is stored only on this PC, in 3DsetuPia's data folder.",
+i_balanced:"Balanced",d_balanced:"Quality, strength and time in balance",i_looks:"Looks",d_looks:"Cleanest surface, time matters less",
+i_strength:"Strength",d_strength:"Functional, strong part",i_speed:"Speed",d_speed:"Fastest print, acceptable quality",
+same_printer:"Printer in the file: {n} (keep)",pick_printer:"— choose a printer —",all_printers:"Show all printers…",loading:"Reading profiles…",
+multi_nozzle:"multi-nozzle",kind_model:"Model only (no settings)",app:"Slicer",printer:"Printer",process:"Process profile",bed:"Plate",objects:"Objects",plates:"Plates",
+slot_auto:"Filament {n} — {name}",used:"in use",main:"used most",sliced_note:"sliced file",
+mode_rules:"Local rules",mode_ai:"AI: {p}",mode_incomplete:"AI setup incomplete",
+ck_provider:"Provider selected",ck_key:"API key entered",ck_key_na:"No key needed",ck_url:"Address entered",ck_test:"Connection tested",
+ck_model:"Model selected",ck_ready:"Ready: 'Prepare settings' will use AI.",ck_rules:"Local rules selected: works without AI, nothing to set up.",
+ck_missing:"Some steps are missing. Local rules are used until they are done.",
+url_fixed:"This provider's address is fixed; nothing to change.",url_edit:"Address where the app runs (the default is usually right).",
+key_na:"This provider needs no key",key_saved:"Saved key: {h} (type a new one to replace it)",key_none:"No key saved yet.",
+key_ph:"Paste your key here",key_replace:"Paste a new key to replace it",key_page:"Get a key at:",model_default:"Suggested: {m}",model_hint:"'Test connection' lists the available models.",
+saved:"Saved.",testing:"Testing…",working:"Working…",changes:"{n} suggestion(s)",selected:"{n} selected",
+from_ai:"AI",from_rules:"rule",nothing_needed:"Your current settings already look right for this model; nothing to change. You can still save the file.",
+c_height:"Height {v} mm",c_contact:"Bed contact {v} mm²",c_overhang:"Overhang {v} mm²",c_thin:"Thinnest part ~{v} mm",c_shape_org:"Curved / organic",c_shape_mech:"Boxy / mechanical",
+c_tall:"Tall and thin",c_tip:"Tipping risk",c_flat:"Large flat top",c_support:"Needs support",c_self:"Prints without support",c_time:"{s} s",
+src_ai:"AI suggestion",src_rules:"Local rules",error:"Error",version:"Version",data:"Data folder",none_found:"No Bambu Studio, QIDI Studio or OrcaSlicer was found on this PC. Tuning for the same printer still works; converting to another printer needs the slicer installed.",
+save_hint:"Tip: open the file in your slicer, press 'Slice' and check the preview.",
+support:"Support the project",support_text:"3DsetuPia is free and open source. A star on GitHub, a bug report or telling a friend helps the most. You can also become a sponsor; entirely optional.",support_star:"⭐ Star on GitHub",support_issue:"🐞 Report a bug / idea",support_sponsor:"❤ Sponsor",support_short:"Like it? Support it with a ⭐ on GitHub"}};
+var S={lang:"tr",intent:"balanced",providers:[],settings:{provider:"none",providers:{}},changes:[],sel:{},busy:false,models:[],
+pages:{},order:[],showKey:false,file:null,printers:[],printersReady:false,allPrinters:false,lastSaved:null,openWith:null};
+function $(id){return document.getElementById(id)}
+function t(k,v){var s=(T[S.lang]&&T[S.lang][k])||T.en[k]||k;if(v)for(var x in v)s=s.split("{"+x+"}").join(v[x]);return s}
+function esc(x){return String(x==null?"":x).replace(/[&<>"']/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
+function send(cmd,extra){var m={command:cmd};if(extra)for(var k in extra)m[k]=extra[k];window.pywebview.api.post(m)}
+function prov(){var id=$("provider").value||S.settings.provider||"none";for(var i=0;i<S.providers.length;i++)if(S.providers[i].id===id)return S.providers[i];return S.providers[0]||{id:"none"}}
+function per(id){return (S.settings.providers||{})[id]||{}}
+
+function paintStatic(){
+  document.querySelectorAll("[data-i]").forEach(function(el){el.textContent=t(el.getAttribute("data-i"))});
+  $("note").placeholder=t("note_ph");$("lang").value=S.lang;document.documentElement.lang=S.lang;
+  $("intents").innerHTML=["balanced","looks","strength","speed"].map(function(i){return '<button type="button" class="intent'+(S.intent===i?" on":"")+'" data-v="'+i+'"><b>'+esc(t("i_"+i))+'</b><span>'+esc(t("d_"+i))+'</span></button>'}).join("");
+  if(S.openWith)$("openSlicer").textContent=t("open_in",{s:S.openWith.label});
+}
+function readiness(){
+  var p=prov(),pp=per(p.id);
+  if(p.id==="none")return {ready:false,rules:true,items:[]};
+  var keyOk=!p.needs_key||pp.has_key,urlOk=!p.url_editable||!!($("url").value||p.base_url),modelOk=!!(pp.model||p.default_model);
+  var items=[[true,t("ck_provider")+": "+p.label],[keyOk,p.needs_key?t("ck_key"):t("ck_key_na")]];
+  if(p.url_editable)items.push([urlOk,t("ck_url")]);
+  items.push([!!pp.tested,t("ck_test")],[modelOk,t("ck_model")+(modelOk?": "+(pp.model||p.default_model):"")]);
+  return {ready:items.every(function(i){return i[0]}),rules:false,items:items};
+}
+function paintMode(){
+  var r=readiness(),pid=S.settings.provider||"none",active=null;
+  for(var i=0;i<S.providers.length;i++)if(S.providers[i].id===pid)active=S.providers[i];
+  var dot=$("modeDot");
+  if(pid==="none"||!active){$("modeText").textContent=t("mode_rules");dot.className="dot ok"}
+  else{var pp=per(pid);var ok=(!active.needs_key||pp.has_key)&&pp.tested&&(pp.model||active.default_model);
+    $("modeText").textContent=ok?t("mode_ai",{p:active.label+(pp.model||active.default_model?" · "+(pp.model||active.default_model):"")}):t("mode_incomplete");
+    dot.className="dot "+(ok?"ok":"warn")}
+  var ul=$("checklist");
+  if(r.rules){ul.innerHTML='<li><span class="dot ok"></span>'+esc(t("ck_rules"))+'</li>';return}
+  ul.innerHTML=r.items.map(function(i){return '<li><span class="dot '+(i[0]?"ok":"bad")+'"></span>'+esc(i[1])+'</li>'}).join("")+
+   '<li style="margin-top:4px"><b>'+esc(r.ready?t("ck_ready"):t("ck_missing"))+'</b></li>';
+}
+function paintProvider(){
+  var p=prov(),pp=per(p.id);
+  $("provHelp").textContent=p.help||"";
+  $("keyPage").innerHTML=p.key_page?esc(t("key_page"))+' <a data-url="'+esc(p.key_page)+'">'+esc(p.key_page)+'</a>':"";
+  var urlOn=!!p.url_editable;$("url").disabled=!urlOn||p.id==="none";
+  $("url").value=urlOn?(pp.base_url||p.base_url||""):(p.base_url||"");
+  $("urlLabel").textContent=t("address")+(urlOn?"":" · "+t("url_fixed"));
+  var keyOn=p.needs_key||p.key_optional;$("key").disabled=!keyOn;$("eye").disabled=!keyOn;$("clearKey").disabled=!keyOn||!pp.has_key;
+  $("key").value="";$("key").placeholder=keyOn?(pp.has_key?t("key_replace"):t("key_ph")):t("key_na");
+  $("keyState").textContent=keyOn?(pp.has_key?t("key_saved",{h:pp.key_hint||"…"}):t("key_none")):t("key_na");
+  $("model").disabled=p.id==="none";
+  $("model").value=pp.model||"";$("model").placeholder=p.default_model||"";
+  $("modelHint").textContent=p.id==="none"?"":(p.default_model?t("model_default",{m:p.default_model})+" · ":"")+t("model_hint");
+  $("models").innerHTML=(S.models||[]).map(function(m){return '<option value="'+esc(m)+'">'}).join("");
+  paintMode();
+}
+
+// ---------------------------------------------------------------- file + target
+function paintFile(){
+  var f=S.file;$("drop").style.display=f?"none":"";$("fileBox").className="file"+(f?" on":"");
+  if(!f){$("go").disabled=true;$("target").disabled=true;$("slot").disabled=true;return}
+  $("fname").textContent=f.file;
+  var kv=[];
+  if(f.kind==="project"){
+    kv.push([t("app"),f.app+(f.app_version?" "+f.app_version:"")+(f.sliced?" · "+t("sliced_note"):"")],[t("printer"),f.printer+(f.extruders>1?" ("+t("multi_nozzle")+")":"")],
+            [t("process"),f.process],[t("bed"),f.bed_type+(f.bed?" · "+Math.round(f.bed[2]-f.bed[0])+"×"+Math.round(f.bed[3]-f.bed[1])+" mm":"")]);
+  }else kv.push([t("app"),t("kind_model")]);
+  var objs=(f.objects||[]).map(function(o){return esc(o.name)+(o.size_mm?' <span class="muted">('+o.size_mm.join("×")+')</span>':"")});
+  kv.push([t("objects"),objs.slice(0,4).join(", ")+(objs.length>4?" …(+"+(objs.length-4)+")":"")]);
+  if(f.plates>1)kv.push([t("plates"),String(f.plates)]);
+  $("fileKv").innerHTML=kv.map(function(r){return '<span>'+esc(r[0])+'</span><span>'+(r[0]===t("objects")?r[1]:esc(r[1]))+'</span>'}).join("");
+  $("filChips").innerHTML=(f.filaments||[]).filter(function(x){return x.used}).map(function(x){return '<span class="chip"><span class="sw" style="background:'+esc(x.colour||"#ccc")+'"></span>'+esc(x.slot+". "+x.name)+'</span>'}).join("");
+  paintTarget();
+}
+function printerLabel(p){return p.model+" · "+p.nozzle+" mm"+(p.extruders>1?" ("+t("multi_nozzle")+")":"")+(p.user?" · "+p.name:"")}
+function paintTarget(){
+  var f=S.file,sel=$("target"),cur=sel.value,html="";
+  if(!f)return;
+  if(f.kind==="project")html+='<option value="same">'+esc(t("same_printer",{n:f.printer}))+'</option>';
+  else html+='<option value="">'+esc(t("pick_printer"))+'</option>';
+  var groups={};(S.printers||[]).forEach(function(p){(groups[p.slicer_label]=groups[p.slicer_label]||[]).push(p)});
+  Object.keys(groups).forEach(function(g){html+='<optgroup label="'+esc(g)+'">'+groups[g].map(function(p){
+    return '<option value="'+esc(p.id)+'"'+(p.extruders>1&&!(f.kind==="project"&&f.same_printer_id===p.id)?" disabled":"")+'>'+esc(printerLabel(p))+'</option>'}).join("")+'</optgroup>'});
+  if(!S.allPrinters&&S.printersReady)html+='<option value="__all">'+esc(t("all_printers"))+'</option>';
+  if(!S.printersReady)html+='<option value="" disabled>'+esc(t("loading"))+'</option>';
+  sel.innerHTML=html;sel.disabled=false;
+  var keep=cur&&Array.prototype.some.call(sel.options,function(o){return o.value===cur&&!o.disabled});
+  if(keep)sel.value=cur;else if(f.kind==="project")sel.value="same";else if(S.lastTarget&&Array.prototype.some.call(sel.options,function(o){return o.value===S.lastTarget}))sel.value=S.lastTarget;
+  paintSlots();
+}
+function paintSlots(){
+  var f=S.file,slot=$("slot");if(!f)return;
+  var target=$("target").value,isSame=target==="same";
+  if(f.kind==="project"){
+    var cur=slot.value;
+    slot.innerHTML=(f.filaments||[]).map(function(x){return '<option value="'+x.slot+'">'+esc(t("slot_auto",{n:x.slot,name:x.name})+(x.slot===f.main_filament?" ("+t("main")+")":(x.used?" ("+t("used")+")":"")))+'</option>'}).join("");
+    slot.value=cur||String(f.main_filament);slot.disabled=false;$("slotLabel").hidden=false;slot.hidden=false;
+  }else{slot.innerHTML="";slot.hidden=true;$("slotLabel").hidden=true}
+  var needFil=!isSame&&target&&target!=="__all";
+  $("filRow").hidden=!needFil;
+  if(needFil&&S.filTarget!==target){S.filTarget=target;$("filament").innerHTML='<option>'+esc(t("loading"))+'</option>';send("filaments",{printer_id:target})}
+  $("go").disabled=S.busy||!target||target==="__all";
+  var p=(S.printers||[]).filter(function(x){return x.id===target})[0];
+  $("targetHint").textContent=p&&p.bed?Math.round(p.bed[2]-p.bed[0])+"×"+Math.round(p.bed[3]-p.bed[1])+"×"+Math.round(p.height)+" mm · "+p.slicer_label:"";
+}
+function paintFilaments(m){
+  if(m.printer_id!==$("target").value)return;
+  var f=S.file,want="";
+  if(f&&f.kind==="project"){var s=Number($("slot").value);var x=(f.filaments||[]).filter(function(y){return y.slot===s})[0];want=x?x.type:""}
+  else want="PLA";
+  var list=m.list||[];
+  $("filament").innerHTML='<option value="">'+esc(S.lang==="tr"?"Otomatik eşleştir":"Match automatically")+(want?" ("+esc(want)+")":"")+'</option>'+
+    list.map(function(x){return '<option value="'+esc(x.name)+'">'+esc(x.name)+(x.type?" · "+esc(x.type):"")+(x.user?" ★":"")+'</option>'}).join("");
+}
+
+// ---------------------------------------------------------------- results
+function chipsFor(a){
+  var s=(a&&a.summary)||{},c=[],tags=s.tags||[];
+  if(s.max_height_mm!=null)c.push(t("c_height",{v:s.max_height_mm}));
+  if(s.min_bed_contact_mm2!=null)c.push(t("c_contact",{v:Math.round(s.min_bed_contact_mm2)}));
+  if(s.total_overhang_below_30deg_mm2)c.push(t("c_overhang",{v:Math.round(s.total_overhang_below_30deg_mm2)}));
+  if(s.min_wall_thickness_p10_mm!=null)c.push(t("c_thin",{v:s.min_wall_thickness_p10_mm}));
+  [["organic","c_shape_org"],["mechanical","c_shape_mech"],["tall_thin","c_tall"],["tipping_risk","c_tip"],["flat_top","c_flat"],["needs_support","c_support"],["self_supporting","c_self"]]
+   .forEach(function(p){if(tags.indexOf(p[0])>=0)c.push(t(p[1]))});
+  return c.map(function(x){return '<span class="chip">'+esc(x)+'</span>'}).join("");
+}
+function progress(text,kind){var p=$("progress");if(!text){p.hidden=true;return}p.hidden=false;p.className="status "+(kind||"");p.innerHTML=(kind?"":'<span class="spin"></span>')+esc(text)}
+function busy(b){S.busy=b;$("go").disabled=b||!$("target").value||$("target").value==="__all";$("saveFile").disabled=b}
+function countSel(){var n=0;for(var k in S.sel)if(S.sel[k])n++;return n}
+function paintChanges(m){
+  $("empty").hidden=true;$("result").hidden=false;
+  $("summary").innerHTML='<div>'+esc(m.summary||"")+'</div><div class="muted" style="margin-top:4px">'+esc(m.source==="ai"?t("src_ai"):t("src_rules"))+(m.seconds!=null?" · "+esc(t("c_time",{s:m.seconds})):"")+" · "+esc(m.target||"")+(m.process?" · "+esc(m.process):"")+'</div>';
+  $("chips").innerHTML=chipsFor(m.analysis);
+  $("notes").innerHTML=(m.notes||[]).map(function(w){return '<div class="status info">'+esc(w)+'</div>'}).join("");
+  $("warnings").innerHTML=(m.warnings||[]).map(function(w){return '<div class="status warn">'+esc(w)+'</div>'}).join("");
+  S.changes=m.changes||[];S.sel={};S.changes.forEach(function(c){S.sel[c.id]=true});
+  var by={};S.changes.forEach(function(c){(by[c.page]=by[c.page]||[]).push(c)});
+  var html=S.changes.length?"":'<div class="status ok">'+esc(t("nothing_needed"))+'</div>';
+  (S.order||[]).forEach(function(pg){var list=by[pg];if(!list)return;
+    html+='<details class="page" open><summary>'+esc(S.pages[pg]||pg)+'<span class="cnt">'+esc(t("changes",{n:list.length}))+'</span></summary>'+
+    list.map(function(c){return '<label class="chg"><input type="checkbox" data-id="'+c.id+'" checked><div><span class="name">'+esc(c.label)+'</span><span class="src">'+esc(c.source==="ai"?t("from_ai"):t("from_rules"))+'</span><div class="vals"><span class="old">'+esc(c.old_display)+'</span> → <span class="new">'+esc(c.new_display)+'</span></div></div><div class="why">'+esc(c.reason||"")+'</div></label>'}).join("")+'</details>'});
+  $("pages").innerHTML=html;$("countText").textContent=t("changes",{n:S.changes.length});
+  $("applyBar").hidden=false;$("afterSave").hidden=true;updSel();
+}
+function updSel(){$("selText").textContent=t("selected",{n:countSel()})}
+function tab(w){$("assist").hidden=w!=="a";$("settings").hidden=w!=="s";$("tabA").className=w==="a"?"on":"";$("tabS").className=w==="s"?"on":"";
+  $("applyBar").style.display=w==="a"?"":"none"}
+
+$("tabA").onclick=function(){tab("a")};$("tabS").onclick=function(){tab("s")};
+$("lang").onchange=function(){S.lang=$("lang").value;paintStatic();paintProvider();paintFile();send("set_lang",{lang:S.lang})};
+$("intents").onclick=function(e){var b=e.target.closest(".intent");if(!b)return;S.intent=b.getAttribute("data-v");paintStatic()};
+$("drop").onclick=function(){send("open_dialog")};$("change").onclick=function(){send("open_dialog")};
+document.addEventListener("dragover",function(e){e.preventDefault();$("drop").classList.add("over")});
+document.addEventListener("dragleave",function(){$("drop").classList.remove("over")});
+document.addEventListener("drop",function(e){e.preventDefault();$("drop").classList.remove("over")});
+$("target").onchange=function(){if($("target").value==="__all"){S.allPrinters=true;send("printers",{all:true});return}S.lastTarget=$("target").value;paintSlots()};
+$("slot").onchange=function(){S.filTarget=null;paintSlots()};
+$("go").onclick=function(){busy(true);$("result").hidden=true;$("applyBar").hidden=true;$("empty").hidden=true;progress(t("working"));
+  send("analyze",{target:$("target").value,slot:Number($("slot").value)||0,filament:$("filRow").hidden?"":$("filament").value,intent:S.intent,note:$("note").value,use_ai:true})};
+$("pages").onchange=function(e){var id=e.target.getAttribute("data-id");if(id!=null){S.sel[id]=e.target.checked;updSel()}};
+$("all").onclick=function(){document.querySelectorAll("#pages input[type=checkbox]").forEach(function(x){x.checked=true;S.sel[x.getAttribute("data-id")]=true});updSel()};
+$("none").onclick=function(){document.querySelectorAll("#pages input[type=checkbox]").forEach(function(x){x.checked=false;S.sel[x.getAttribute("data-id")]=false});updSel()};
+$("saveFile").onclick=function(){var ids=[];for(var k in S.sel)if(S.sel[k])ids.push(Number(k));busy(true);progress(t("working"));send("save",{ids:ids})};
+$("openSlicer").onclick=function(){if(S.lastSaved)send("open_in_slicer",{path:S.lastSaved})};
+$("showFolder").onclick=function(){if(S.lastSaved)send("show_folder",{path:S.lastSaved})};
+$("provider").onchange=function(){S.models=[];paintProvider()};
+$("sStar").onclick=function(){if(S.repo)send("open_url",{url:S.repo})};
+$("starLink").onclick=function(){if(S.repo)send("open_url",{url:S.repo})};
+$("sIssue").onclick=function(){if(S.repo)send("open_url",{url:S.repo+"/issues"})};
+$("sSponsor").onclick=function(){if(S.sponsor)send("open_url",{url:S.sponsor})};
+$("eye").onclick=function(){S.showKey=!S.showKey;$("key").type=S.showKey?"text":"password"};
+document.addEventListener("click",function(e){var a=e.target.closest("a[data-url]");if(a){e.preventDefault();send("open_url",{url:a.getAttribute("data-url")})}});
+function settingsMsg(extra){var p=prov();var m={provider:p.id,model:$("model").value,base_url:p.url_editable?$("url").value:""};
+  var k=$("key").value;if(k)m.api_key=k;if(extra)for(var x in extra)m[x]=extra[x];return m}
+$("save").onclick=function(){send("save_settings",settingsMsg())};
+$("clearKey").onclick=function(){send("save_settings",settingsMsg({clear_key:true}))};
+$("test").onclick=function(){send("save_settings",settingsMsg());var s=$("setStatus");s.hidden=false;s.className="status";s.innerHTML='<span class="spin"></span>'+esc(t("testing"));send("test")};
+
+window.__ayarciRecv=function(m){if(!m||!m.command)return;
+  if(m.command==="init"){S.lang=m.lang||"tr";S.providers=m.providers||[];S.settings=m.settings||S.settings;S.pages=m.pages||{};S.order=m.page_order||[];S.lastTarget=m.last_target||"";
+    $("provider").innerHTML=S.providers.map(function(p){return '<option value="'+esc(p.id)+'">'+esc(p.label)+'</option>'}).join("");
+    $("provider").value=S.settings.provider||"none";paintStatic();paintProvider();
+    $("slicers").innerHTML=(m.slicers||[]).length?(m.slicers||[]).map(function(s){return '<span>'+esc(s.label)+'</span><span>'+esc(s.version||"")+(s.exe?"":" · exe ?")+'</span>'}).join(""):'<span></span><span>'+esc(t("none_found"))+'</span>';
+    S.repo=m.repo||"";S.sponsor=m.sponsor||"";
+    $("about").innerHTML='<span>3DsetuPia</span><span>'+esc(m.version)+'</span><span>'+esc(t("data"))+'</span><span><code class="sel">'+esc(m.data_dir||"")+'</code></span><span>GitHub</span><span><a data-url="'+esc(m.repo||"")+'">'+esc(m.repo||"")+'</a></span>'}
+  else if(m.command==="printers"){S.printers=m.list||[];S.printersReady=!!m.ready;paintTarget()}
+  else if(m.command==="file"){S.file=m.info;S.filTarget=null;$("result").hidden=true;$("applyBar").hidden=true;$("empty").hidden=false;progress(m.text||"",m.text?"warn":"");paintFile()}
+  else if(m.command==="filaments"){paintFilaments(m)}
+  else if(m.command==="progress"){progress(m.text)}
+  else if(m.command==="proposals"){busy(false);if(!m.ok){progress(m.text,"bad");$("empty").hidden=false;return}progress("");paintChanges(m)}
+  else if(m.command==="saved"){busy(false);progress(m.text+(m.ok?"\n"+t("save_hint"):""),m.ok?"ok":"bad");
+    if(m.ok){S.lastSaved=m.path;S.openWith=m.open_with||null;$("afterSave").hidden=false;$("openSlicer").hidden=!S.openWith;if(S.openWith)$("openSlicer").textContent=t("open_in",{s:S.openWith.label})}}
+  else if(m.command==="settings_saved"){S.settings=m.settings||S.settings;paintProvider();var s=$("setStatus");if(s.innerHTML.indexOf("spin")<0){s.hidden=false;s.className="status ok";s.textContent=t("saved")}}
+  else if(m.command==="test_result"){if(m.settings)S.settings=m.settings;S.models=m.models||[];paintProvider();var s2=$("setStatus");s2.hidden=false;s2.className="status "+(m.ok?"ok":"bad");s2.textContent=m.text}
+  else if(m.command==="notice"){progress(m.text,m.kind||"warn")}
+  else if(m.command==="error"){busy(false);progress(t("error")+": "+m.text,"bad")}
+};
+paintStatic();
+function boot(n){if(S.booted)return;if(window.pywebview&&window.pywebview.api&&window.pywebview.api.post){S.booted=true;send("init");return}
+  if(n<200)setTimeout(function(){boot(n+1)},50)}
+window.addEventListener("pywebviewready",function(){boot(0)});boot(0);
+})();
+</script>
+</body></html>

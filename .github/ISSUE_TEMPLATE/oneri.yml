@@ -1,0 +1,11 @@
+name: Öneri / Feature request
+description: Yeni ayar, kural, sağlayıcı ya da fikir / New setting, rule, provider or idea
+labels: [enhancement]
+body:
+  - type: textarea
+    id: idea
+    attributes:
+      label: Öneri / Idea
+      description: Hangi durumda, hangi ayar, neden? / Which situation, which setting, why?
+    validations:
+      required: true

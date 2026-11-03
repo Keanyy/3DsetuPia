@@ -1,0 +1,17 @@
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+venv/
+node_modules/
+docs/img/_preview_payloads.json
+# kişisel ayar/anahtar dosyaları asla depoya girmesin / never commit keys
+ayarci_settings.json
+ayarci_last_run.json
+
+# derleme çıktıları / build output
+*.spec
+build/
+dist/*.exe
+dist/SHA256SUMS.txt
+ayarci_error.log

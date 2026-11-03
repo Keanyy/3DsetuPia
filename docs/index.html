@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>3DsetuPia – 3D baskı ayarı asistanı</title>
+<meta name="description" content="Bambu Studio, QIDI Studio ve OrcaSlicer projelerini modele göre ayarlayan ücretsiz, açık kaynak Windows programı.">
+<meta property="og:title" content="3DsetuPia – 3D baskı ayarı asistanı">
+<meta property="og:description" content="3MF'i bırak; modeli ölçer, ayarları nedenleriyle önerir, yeni bir 3MF yazar. Başka yazıcıya da taşır. Ücretsiz ve açık kaynak.">
+<meta property="og:image" content="https://keanyy.github.io/3DsetuPia/img/program_tr.jpg">
+<meta property="og:url" content="https://keanyy.github.io/3DsetuPia/">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/png" href="img/icon.png">
+<style>
+:root{--a:#00897b;--a2:#00695c;--fg:#1f2328;--bg:#f6f7f8;--card:#fff;--mut:#5f6b76;--line:rgba(127,127,127,.25);--soft:rgba(0,137,123,.08)}
+@media (prefers-color-scheme:dark){:root{--a:#26a69a;--a2:#4db6ac;--fg:#e6e8eb;--bg:#121417;--card:#1b1e22;--mut:#9aa3ad;--line:rgba(160,160,160,.22);--soft:rgba(38,166,154,.10)}}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.6 "Segoe UI",system-ui,-apple-system,sans-serif}
+a{color:var(--a)}
+.wrap{max-width:1080px;margin:0 auto;padding:0 20px}
+nav{display:flex;align-items:center;gap:12px;padding:16px 0}
+nav img{width:34px;height:34px}
+nav b{font-size:18px;flex:1}
+nav button,nav a.gh{font:inherit;font-size:14px;background:transparent;color:var(--fg);border:1px solid var(--line);border-radius:8px;padding:5px 10px;cursor:pointer;text-decoration:none}
+.hero{display:grid;grid-template-columns:1.05fr 1fr;gap:40px;align-items:center;padding:40px 0 30px}
+.hero h1{font-size:44px;line-height:1.1;margin:0 0 16px;letter-spacing:-.02em}
+.hero h1 span{color:var(--a)}
+.hero p.lead{font-size:19px;color:var(--mut);margin:0 0 26px}
+.cta{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.btn{display:inline-flex;align-items:center;gap:8px;background:var(--a);color:#fff;text-decoration:none;font-weight:600;padding:13px 22px;border-radius:10px;font-size:17px}
+.btn:hover{background:var(--a2)}
+.btn.ghost{background:transparent;color:var(--fg);border:1px solid var(--line)}
+.small{font-size:13px;color:var(--mut);margin-top:12px}
+.shot{border-radius:12px;border:1px solid var(--line);box-shadow:0 18px 50px rgba(0,0,0,.18);width:100%;display:block}
+.badges{display:flex;gap:8px;flex-wrap:wrap;margin:18px 0 0}
+.badges span{font-size:13px;border:1px solid var(--line);border-radius:20px;padding:3px 10px;background:var(--card)}
+section{padding:46px 0}
+h2{font-size:30px;margin:0 0 8px;letter-spacing:-.01em}
+.sub{color:var(--mut);margin:0 0 28px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px}
+.card h3{margin:6px 0 6px;font-size:18px}
+.card p{margin:0;color:var(--mut);font-size:15px}
+.ic{font-size:26px}
+.steps{counter-reset:s;display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.steps .card{position:relative;padding-top:44px}
+.steps .card:before{counter-increment:s;content:counter(s);position:absolute;top:14px;left:20px;width:24px;height:24px;border-radius:50%;background:var(--a);color:#fff;font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center}
+.band{background:var(--soft);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+ul.tick{list-style:none;padding:0;margin:0}
+ul.tick li{padding:6px 0 6px 28px;position:relative}
+ul.tick li:before{content:"✓";position:absolute;left:0;color:var(--a);font-weight:700}
+ul.no li:before{content:"✕";color:#d0453a}
+details{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 18px;margin-bottom:10px}
+summary{cursor:pointer;font-weight:600}
+details p{color:var(--mut);margin:10px 0 0}
+footer{padding:30px 0 50px;color:var(--mut);font-size:14px;border-top:1px solid var(--line)}
+[data-lang="en"] .tr,[data-lang="tr"] .en{display:none!important}
+@media (max-width:860px){.hero{grid-template-columns:1fr}.hero h1{font-size:34px}.grid,.steps,.two{grid-template-columns:1fr}}
+</style>
+</head>
+<body data-lang="tr">
+<div class="wrap">
+<nav>
+  <img src="img/icon.png" alt=""><b>3DsetuPia</b>
+  <button id="lang" type="button">EN</button>
+  <a class="gh" href="https://github.com/Keanyy/3DsetuPia">GitHub</a>
+</nav>
+
+<div class="hero">
+  <div>
+    <h1 class="tr">3D baskı ayarlarını <span>modele göre</span> yapan asistan</h1>
+    <h1 class="en">The assistant that tunes print settings <span>for your model</span></h1>
+    <p class="lead tr">3MF'i bırak: 3DsetuPia modeli ölçer, yazıcını ve filamentini okur, onlarca ayarı nedenleriyle önerir. Seçtiklerini yeni bir 3MF'e yazar. Başka yazıcı için hazırlanmış dosyayı da senin yazıcına taşır.</p>
+    <p class="lead en">Drop a 3MF: 3DsetuPia measures the model, reads your printer and filament, and suggests dozens of settings with reasons. Your picks go into a new 3MF. It can also move a project made for another printer to yours.</p>
+    <div class="cta">
+      <a class="btn" href="https://github.com/Keanyy/3DsetuPia/releases/latest/download/3DsetuPia.exe">⬇ <span class="tr">Windows için indir</span><span class="en">Download for Windows</span></a>
+      <a class="btn ghost" href="https://github.com/Keanyy/3DsetuPia"><span class="tr">Kaynak kodu</span><span class="en">Source code</span></a>
+    </div>
+    <div class="small tr">Ücretsiz · açık kaynak (AGPL-3.0) · kurulum gerekmez · Windows 10/11</div>
+    <div class="small en">Free · open source (AGPL-3.0) · no installation · Windows 10/11</div>
+    <div class="badges"><span>Bambu Studio</span><span>QIDI Studio</span><span>OrcaSlicer</span><span>3MF · STL · OBJ</span></div>
+  </div>
+  <img class="shot" src="img/program_tr.jpg" alt="3DsetuPia">
+</div>
+</div>
+
+<section class="band"><div class="wrap">
+  <h2 class="tr">Ne yapar?</h2><h2 class="en">What it does</h2>
+  <p class="sub tr">Kalite, Dayanıklılık, Hız, Destek ve Filament sekmelerindeki ayarları senin modeline göre hazırlar.</p>
+  <p class="sub en">It prepares Quality, Strength, Speed, Support and Filament settings for your model.</p>
+  <div class="grid">
+    <div class="card"><div class="ic">📐</div><h3 class="tr">Modeli ölçer</h3><h3 class="en">Measures the model</h3>
+      <p class="tr">Sarkma alanı, tabana temas, duvar kalınlığı, devrilme riski, düz yüzeyler. Bilgisayarında, internetsiz.</p>
+      <p class="en">Overhangs, bed contact, wall thickness, tipping risk, flat tops. On your PC, offline.</p></div>
+    <div class="card"><div class="ic">🖨️</div><h3 class="tr">Yazıcını tanır</h3><h3 class="en">Knows your printer</h3>
+      <p class="tr">Yazıcı, nozul, tabla ve filamentler dosyadan okunur. Çift nozullu yazıcılarda doğru nozulu seçer.</p>
+      <p class="en">Printer, nozzle, plate and filaments are read from the file, even on multi-nozzle printers.</p></div>
+    <div class="card"><div class="ic">✅</div><h3 class="tr">Sen onaylarsın</h3><h3 class="en">You approve</h3>
+      <p class="tr">Her öneri nedeniyle listelenir. İstemediğinin işaretini kaldırırsın; asıl dosyana hiç dokunulmaz.</p>
+      <p class="en">Every suggestion comes with a reason. Untick what you don't want; your original file is never touched.</p></div>
+    <div class="card"><div class="ic">🔁</div><h3 class="tr">Başka yazıcıya taşır</h3><h3 class="en">Moves to another printer</h3>
+      <p class="tr">Üreticinin kendi profilleriyle kurar, filamentleri eşleştirir, nesneleri yeni tablanın ortasına koyar.</p>
+      <p class="en">Uses the maker's own profiles, matches filaments and centres the objects on the new bed.</p></div>
+    <div class="card"><div class="ic">🤖</div><h3 class="tr">Yapay zekâ isteğe bağlı</h3><h3 class="en">AI is optional</h3>
+      <p class="tr">Yerleşik kurallarla ücretsiz çalışır. İstersen Claude, OpenAI, Gemini ya da bilgisayarındaki Ollama.</p>
+      <p class="en">Works free with built-in rules, or with Claude, OpenAI, Gemini or a local Ollama.</p></div>
+    <div class="card"><div class="ic">🛡️</div><h3 class="tr">Güvenli sınırlar</h3><h3 class="en">Safe limits</h3>
+      <p class="tr">Yalnızca izinli ayarlar, güvenli aralıklar. Renklere, boyamaya ve G-code'a asla dokunmaz.</p>
+      <p class="en">Whitelisted settings and safe ranges only. Never touches colours, painting or G-code.</p></div>
+  </div>
+</div></section>
+
+<section><div class="wrap">
+  <h2 class="tr">Nasıl kullanılır?</h2><h2 class="en">How it works</h2>
+  <p class="sub tr">Bir dakikadan kısa sürer.</p><p class="sub en">Takes less than a minute.</p>
+  <div class="steps">
+    <div class="card"><h3 class="tr">Dosyayı bırak</h3><h3 class="en">Drop the file</h3><p class="tr">Slicer'da kaydettiğin 3MF, indirdiğin bir proje ya da STL.</p><p class="en">A 3MF you saved, a downloaded project or an STL.</p></div>
+    <div class="card"><h3 class="tr">Yazıcı ve öncelik</h3><h3 class="en">Printer and goal</h3><p class="tr">Dengeli, Görünüş, Dayanıklılık ya da Hız.</p><p class="en">Balanced, Looks, Strength or Speed.</p></div>
+    <div class="card"><h3 class="tr">Önerileri seç</h3><h3 class="en">Pick suggestions</h3><p class="tr">Sekme sekme, nedenleriyle.</p><p class="en">Page by page, with reasons.</p></div>
+    <div class="card"><h3 class="tr">Kaydet ve dilimle</h3><h3 class="en">Save and slice</h3><p class="tr">Yeni 3MF tek tıkla slicer'ında açılır.</p><p class="en">The new 3MF opens in your slicer with one click.</p></div>
+  </div>
+</div></section>
+
+<section class="band"><div class="wrap two">
+  <div><h2 class="tr">Gizlilik</h2><h2 class="en">Privacy</h2>
+    <ul class="tick tr"><li>3D modelin hiçbir yere gönderilmez.</li><li>Yapay zekâya yalnızca ölçümler (sayılar) ve ayar değerleri gider.</li><li>API anahtarın yalnızca bilgisayarında saklanır.</li><li>Program kullanım verisi toplamaz.</li></ul>
+    <ul class="tick en"><li>Your 3D model is never uploaded.</li><li>The AI only receives measurements (numbers) and setting values.</li><li>Your API key stays on your PC.</li><li>No usage tracking.</li></ul></div>
+  <div><h2 class="tr">Dokunmadıkları</h2><h2 class="en">Never touched</h2>
+    <ul class="tick no tr"><li>Renkler ve boyama</li><li>G-code ve makine ayarları</li><li>Nesnelere özel ayarlar</li><li>Kaynak dosyan (her zaman yeni dosya yazılır)</li></ul>
+    <ul class="tick no en"><li>Colours and painting</li><li>G-code and machine settings</li><li>Per-object settings</li><li>Your source file (a new file is always written)</li></ul></div>
+</div></section>
+
+<section><div class="wrap">
+  <h2 class="tr">Sık sorulanlar</h2><h2 class="en">FAQ</h2>
+  <details><summary class="tr">Windows "bilgisayarınızı korudu" diyor</summary><summary class="en">Windows says it protected my PC</summary>
+    <p class="tr">Program kod imzası taşımadığı için SmartScreen uyarır. "Ek bilgi → Yine de çalıştır" deyin. Kaynak kodun tamamı GitHub'da açık; dosyanın SHA-256 değeri sürüm sayfasında yazıyor.</p>
+    <p class="en">The program is not code-signed, so SmartScreen warns. Choose "More info → Run anyway". All source code is on GitHub; the SHA-256 of the file is on the release page.</p></details>
+  <details><summary class="tr">Hangi slicer'lar gerekli?</summary><summary class="en">Which slicers are needed?</summary>
+    <p class="tr">Bilgisayarda Bambu Studio, QIDI Studio veya OrcaSlicer'dan biri kurulu olmalı; yazıcı listesi ve profiller oradan okunur. PrusaSlicer ve Cura projeleri henüz desteklenmiyor.</p>
+    <p class="en">One of Bambu Studio, QIDI Studio or OrcaSlicer must be installed; printers and profiles come from it. PrusaSlicer and Cura projects are not supported yet.</p></details>
+  <details><summary class="tr">Ücretli mi?</summary><summary class="en">Does it cost anything?</summary>
+    <p class="tr">Hayır, tamamen ücretsiz ve açık kaynak. Yapay zekâ kullanmak istersen sağlayıcının kendi ücreti olabilir; yerleşik kurallar ve Ollama ücretsizdir.</p>
+    <p class="en">No, it is free and open source. AI providers may charge for their API; built-in rules and Ollama are free.</p></details>
+  <details><summary class="tr">Çok nozullu yazıcılar (H2D, H2C)?</summary><summary class="en">Multi-nozzle printers (H2D, H2C)?</summary>
+    <p class="tr">Bu yazıcıların projelerinde ayar yapmak tam çalışır. Başka bir yazıcının projesini bunlara dönüştürmek şimdilik Bambu Studio'da yapılmalı.</p>
+    <p class="en">Tuning their projects works fully. Converting another printer's project to them is done in Bambu Studio for now.</p></details>
+</div></section>
+
+<div class="wrap"><footer>
+  <span class="tr">3DsetuPia, Kenan Çelik'in bağımsız bir topluluk projesidir; Bambu Lab, QIDI veya OrcaSlicer ile resmi bir bağı yoktur. Ürün adları sahiplerinin markalarıdır. Ayarlar öneri niteliğindedir; baskıdan önce dilimleme önizlemesini kontrol edin.
+  Beğendiysen <a href="https://github.com/Keanyy/3DsetuPia">GitHub'da ⭐</a> vererek destek olabilirsin.</span>
+  <span class="en">3DsetuPia is an independent community project by Kenan Çelik, not affiliated with Bambu Lab, QIDI or OrcaSlicer. Product names are trademarks of their owners. Settings are suggestions; always check the slicer preview.
+  If you like it, a <a href="https://github.com/Keanyy/3DsetuPia">⭐ on GitHub</a> helps.</span>
+</footer></div>
+
+<script>
+(function(){
+  var b=document.body,btn=document.getElementById("lang");
+  function set(l){b.setAttribute("data-lang",l);document.documentElement.lang=l;btn.textContent=l==="tr"?"EN":"TR";
+    try{localStorage.setItem("lang",l)}catch(e){}}
+  var saved=null;try{saved=localStorage.getItem("lang")}catch(e){}
+  set(saved||((navigator.language||"").toLowerCase().indexOf("tr")===0?"tr":"en"));
+  btn.onclick=function(){set(b.getAttribute("data-lang")==="tr"?"en":"tr")};
+})();
+</script>
+</body>
+</html>

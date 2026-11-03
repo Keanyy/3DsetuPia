@@ -1,0 +1,48 @@
+name: tests
+on:
+  push:
+  pull_request:
+jobs:
+  test:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        python: ["3.12", "3.13"]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - run: python -m pip install -r requirements-dev.txt
+      - run: python tools/build_plugin.py
+      - run: python -m pytest -q
+      - name: dist/ayarci.py is up to date
+        if: matrix.os == 'ubuntu-latest' && matrix.python == '3.12'
+        run: git diff --exit-code dist/ayarci.py
+
+  exe:
+    needs: test
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: python -m pip install -r requirements-app.txt
+      - run: python tools/build_exe.py --workdir build
+      - name: self-test of the built program (no window)
+        shell: pwsh
+        run: |
+          $v = python -c "import sys; sys.path.insert(0, 'tests'); from meshes import box; import numpy as np; v, t = box(20, 20, 20); tri = v[t]; d = bytearray(80) + len(tri).to_bytes(4, 'little'); [d.extend(np.zeros(3, np.float32).tobytes() + f.astype(np.float32).tobytes() + b'\0\0') for f in tri]; open('cube.stl', 'wb').write(bytes(d))"
+          Start-Process -Wait -FilePath dist\3DsetuPia.exe -ArgumentList "--selftest", "$PWD\cube.stl", "$PWD\selftest"
+          if (!(Test-Path selftest\selftest.json)) { Write-Error "the program did not start"; exit 1 }
+          # no slicer is installed on the build machine, so "need_target" is the expected answer here
+          Get-Content selftest\selftest.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: 3DsetuPia-exe
+          path: |
+            dist/3DsetuPia.exe
+            dist/SHA256SUMS.txt
+            selftest/selftest.json

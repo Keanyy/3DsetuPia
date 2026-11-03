@@ -1,0 +1,45 @@
+name: Hata bildirimi / Bug report
+description: 3DsetuPia beklendiği gibi çalışmadı / Something did not work
+labels: [bug]
+body:
+  - type: dropdown
+    id: kind
+    attributes:
+      label: Hangisi? / Which one?
+      options:
+        - 3DsetuPia programı (exe) / program
+        - OrcaSlicer eklentisi (ayarci.py) / OrcaSlicer plugin
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: 3DsetuPia sürümü / version
+      description: AI Ayarı → Hakkında / AI setup → About
+      placeholder: "1.1.0"
+    validations:
+      required: true
+  - type: input
+    id: slicer
+    attributes:
+      label: Slicer ve sürümü / Slicer and version
+      placeholder: "Bambu Studio 2.8.2 / QIDI Studio 2.7.2 / OrcaSlicer 2.5.0"
+    validations:
+      required: true
+  - type: input
+    id: setup
+    attributes:
+      label: Yazıcı, nozul, filament, AI sağlayıcısı / Printer, nozzle, filament, AI provider
+      placeholder: "Bambu H2C 0.4 → QIDI Q2 0.4, Generic PLA, yerel kurallar"
+  - type: textarea
+    id: what
+    attributes:
+      label: Ne oldu, ne bekliyordun? / What happened, what did you expect?
+    validations:
+      required: true
+  - type: textarea
+    id: log
+    attributes:
+      label: ayarci_last_run.json / ayarci_error.log (isteğe bağlı / optional)
+      description: "Program: %APPDATA%\\3DsetuPia. API anahtarı içermez. Mümkünse 3MF dosyasını da ekleyin. / Contains no API key. Attach the 3MF if you can."
+      render: json
