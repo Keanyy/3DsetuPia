@@ -366,11 +366,11 @@ class AyarciAssistant(orca.script.ScriptPluginCapabilityBase):
                   "seconds": round(time.time() - t0, 1),
                   "filament_switch": presets["filament_selected"] != presets["filament_slot1"],
                   "filament_from": presets["filament_slot1"], "filament_to": presets["filament_selected"]}
-        self._post(result)
         self.store.write_last_run({"ctx": {k: v for k, v in ctx.items() if k != "current"},
                                    "current": ctx["current"], "analysis": analysis, "baseline": baseline,
                                    "proposals": proposals, "changes": changes, "rejected": rejected,
                                    "warnings": warnings, "provider": cfg["provider"], "model": cfg["model"]})
+        self._post(result)
 
     def _do_apply(self, item):
         lang = self._lang()

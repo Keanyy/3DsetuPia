@@ -250,9 +250,9 @@ class App:
                                      lang=lang, provider_cfg=cfg, use_ai=bool(item.get("use_ai", True)),
                                      progress=lambda text: self.send({"command": "progress", "text": text}))
         log = result.pop("log", {})
-        self.send(dict(result, command="proposals"))
         self.store.write_last_run(dict(log, file=self.job.path, target=target, changes=result["changes"],
                                        warnings=result["warnings"], provider=cfg["provider"], model=cfg["model"]))
+        self.send(dict(result, command="proposals"))
 
     def _save_dialog(self, item):
         lang = self.lang()

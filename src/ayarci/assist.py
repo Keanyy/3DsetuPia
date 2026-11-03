@@ -65,9 +65,12 @@ class Store:
     def write_last_run(self, data):
         if not self.folder:
             return
+        path = os.path.join(self.folder, LAST_RUN_FILE)
         try:
-            with open(os.path.join(self.folder, LAST_RUN_FILE), "w", encoding="utf-8") as fh:
+            # whole file or nothing: a reader never sees it half written
+            with open(path + ".tmp", "w", encoding="utf-8") as fh:
                 json.dump(_plain(data), fh, ensure_ascii=False, indent=1)
+            os.replace(path + ".tmp", path)
         except Exception:
             pass
 
