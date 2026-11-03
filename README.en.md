@@ -13,6 +13,13 @@ settings **for that model**, and writes a new, improved **3MF** file.
 - **Changes nothing without asking**: suggestions come with reasons, you pick.
 - **Never touches your original file**: the result is written to `…_ayarci.3mf`.
 
+## ⬇️ [Download for Windows: 3DsetuPia.exe](https://github.com/Keanyy/3DsetuPia/releases/latest/download/3DsetuPia.exe)
+
+One file, no installation. · [All releases](https://github.com/Keanyy/3DsetuPia/releases) ·
+[Website](https://keanyy.github.io/3DsetuPia/)
+
+> The green **Code → Download ZIP** button downloads the **source code**, not the program.
+
 ## What it does
 
 1. Opens a 3MF project, a settings-free 3MF (CAD export), an STL or an OBJ.

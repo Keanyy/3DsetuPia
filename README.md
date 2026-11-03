@@ -13,6 +13,14 @@ sonra yeni ve iyileştirilmiş bir **3MF** dosyası yazan bir Windows programıd
 - **Hiçbir şeyi sormadan değiştirmez.** Önerileri nedenleriyle listeler, siz seçersiniz.
 - **Asıl dosyanıza dokunmaz.** Sonuç `…_ayarci.3mf` adıyla yeni bir dosyaya yazılır.
 
+## ⬇️ [Windows için indir: 3DsetuPia.exe](https://github.com/Keanyy/3DsetuPia/releases/latest/download/3DsetuPia.exe)
+
+Tek dosya, kurulum gerekmez. · [Tüm sürümler](https://github.com/Keanyy/3DsetuPia/releases) ·
+[Tanıtım sayfası](https://keanyy.github.io/3DsetuPia/)
+
+> Yeşil **Code → Download ZIP** düğmesi programı değil, **kaynak kodunu** indirir. Programı kullanmak için
+> yukarıdaki bağlantıyı kullanın.
+
 ![3DsetuPia](docs/img/program_tr.jpg)
 
 ## Ne yapar?
