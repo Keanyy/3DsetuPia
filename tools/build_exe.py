@@ -60,6 +60,7 @@ def main():
     ap.add_argument("--workdir", default=os.path.join(os.environ.get("LOCALAPPDATA", ROOT), "3DsetuPia-build"))
     ap.add_argument("--out", default=os.path.join(ROOT, "dist"), help="folder for the .exe (default: dist)")
     args = ap.parse_args()
+    args.workdir = os.path.abspath(args.workdir)   # PyInstaller resolves paths against the spec folder
     out_dir = os.path.abspath(args.out)
     version = _version()
     parts = (re.findall(r"\d+", version) + ["0", "0", "0"])[:3]
